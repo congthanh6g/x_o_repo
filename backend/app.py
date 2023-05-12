@@ -69,15 +69,13 @@ class GameClient:
                 self.room_id = data.get("room_id")
 
             # Nhận thông tin trò chơi
-            elif data.get("board"):
+            elif data.get("board") and data.get("status") == None:
                 # Nếu là lượt đi của đội của mình thì gửi nước đi             
                 log_game_info(game_info=game_info)
                 if data.get("turn") in self.team_id:
                     self.size = int(data.get("size"))
                     self.board = copy.deepcopy(data.get("board"))
 
-                    print(self.team_roles)
-                    print(Piece.ALLY)
                     # Lấy nước đi từ AI, nước đi là một tuple (i, j)
                     if self.team_roles == Piece.ALLY.value: # x
                         move = aiX.get_move(self.board, self.size)
@@ -98,7 +96,7 @@ class GameClient:
                         print("Invalid move")
 
             # Kết thúc trò chơi
-            elif data.get("status"):
+            elif data.get("status") != None:
                 print("Game over")
                 break
 
@@ -174,13 +172,14 @@ if __name__ == "__main__":
     team_roles = input("Enter team role (x/o): ").lower()
     # Khởi tạo game client
     gameClient = GameClient(host, team_id, team_roles)
-    game_thread = Thread(target=gameClient.listen)
-    game_thread.start()
-    app.run(host="0.0.0.0", port=3005)
-    try:
-        while game_thread.is_alive():
-            game_thread.join(1)
-    except KeyboardInterrupt:
-        stop_thread = True
-        game_thread.join()
-        print("Game client stopped")
+    gameClient.listen()
+    # game_thread = Thread(target=gameClient.listen)
+    # game_thread.start()
+    # app.run(host="0.0.0.0", port=3005)
+    # try:
+    #     while game_thread.is_alive():
+    #         game_thread.join(1)
+    # except KeyboardInterrupt:
+    #     stop_thread = True
+    #     game_thread.join()
+    #     print("Game client stopped")

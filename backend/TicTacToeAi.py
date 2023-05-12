@@ -25,8 +25,8 @@ dM = Direction.TRAVERSE_MAIN_DIAG
 dA = Direction.TRAVERSE_ANTI_DIAG
 dirs = Direction.DIR
 STREAK_LEN = 5
-win_situation_score = 1000
-lose_situation_score = 900
+win_situation_score = 1500
+lose_situation_score = 500
 
 class Piece(Enum):
     ALLY = 'x'
@@ -43,15 +43,6 @@ class TicTacToeAI:
                 if board[i][j] != ' ':
                     return False
         return True
-    
-    def printBoard(self, board, size):
-        new_board = [['_' for _ in range(size)] for _ in range(size)]
-        for i in range(size):
-            for j in range(size):
-                if board[i][j] != ' ':
-                    new_board[i][j] = board[i][j]
-        for i in range(size):
-            print(new_board[i])
 
     def get_move(self, board, size):
         # Find all available positions on the board
@@ -71,7 +62,7 @@ class TicTacToeAI:
 
             possible_moves = []
             for dir in dirs.value:
-                for coord in taken:
+                for coord in taken: # range(5) 0-> 4 range(1,5) = 
                     for length in range(1, STREAK_LEN):
                         move = self._march(coord, dir, length, size)
                         if move not in taken and move not in possible_moves:
@@ -86,10 +77,6 @@ class TicTacToeAI:
                     best_move = move
         return best_move
     
-    def get_move_input(self):
-        r, c = input('Enter row, col: ').split()
-        return int(r), int(c) 
-
         
     def validate(self, r, c, size):
         return r >= 0 and r < size and c >= 0 and c < size
