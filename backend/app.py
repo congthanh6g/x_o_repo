@@ -9,6 +9,7 @@ from flask_cors import CORS, cross_origin
 
 from TicTacToeAi import TicTacToeAI
 from TicTacToeAi import Piece
+from random_tictactoe import RandomTicTacToeAI
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -19,8 +20,10 @@ team_id = 123 # team_id mặc định
 game_info = {}  # Thông tin trò chơi để hiển thị trên giao diện
 stop_thread = False  # Biến dùng để dừng thread lắng nghe
 
-ai = TicTacToeAI(Piece.ALLY)  # Khởi tạo AI chạy mặc định với đội X
-
+aiX = TicTacToeAI(Piece.ALLY)  # Khởi tạo AI chạy mặc định với đội X
+aiO = TicTacToeAI(Piece.ENEMY)
+randomX = RandomTicTacToeAI(Piece.ALLY)
+randomY = RandomTicTacToeAI(Piece.ENEMY)
 
 # Giao tiếp với trọng tài qua API:
 # nghe trọng tài trả về thông tin hiển thị ở '/', gửi yêu cầu khởi tại qua '/init/' và gửi nước đi qua '/move'
@@ -73,16 +76,17 @@ class GameClient:
                     self.size = int(data.get("size"))
                     self.board = copy.deepcopy(data.get("board"))
 
-
+                    print(self.team_roles)
+                    print(Piece.ALLY)
                     # Lấy nước đi từ AI, nước đi là một tuple (i, j)
-                    if self.team_roles == Piece.ALLY: # x
-                        ai = TicTacToeAI(Piece.ALLY)
-                        move = ai.get_move(self.board, self.size)
+                    if self.team_roles == Piece.ALLY.value: # x
+                        move = aiX.get_move(self.board, self.size)
                         print("Move: ", move)
                     else: # o
-                        ai = TicTacToeAI(Piece.ENEMY)
-                        move = ai.get_move(self.board, self.size)
+                        move = randomY.get_move(self.board, self.size)
                         print("Move: ", move)
+
+                    
                     # Kiểm tra nước đi hợp lệ
                     valid_move = self.check_valid_move(move)
                     # Nếu hợp lệ thì gửi nước đi
@@ -92,7 +96,7 @@ class GameClient:
                         self.send_move()
                     else:
                         print("Invalid move")
-                        
+
             # Kết thúc trò chơi
             elif data.get("status"):
                 print("Game over")

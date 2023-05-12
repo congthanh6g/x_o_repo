@@ -29,8 +29,8 @@ win_situation_score = 1000
 lose_situation_score = 900
 
 class Piece(Enum):
-    ALLY = 'X'
-    ENEMY = 'O'
+    ALLY = 'x'
+    ENEMY = 'o'
 
 class TicTacToeAI:
     def __init__(self, player):
@@ -43,6 +43,15 @@ class TicTacToeAI:
                 if board[i][j] != ' ':
                     return False
         return True
+    
+    def printBoard(self, board, size):
+        new_board = [['_' for _ in range(size)] for _ in range(size)]
+        for i in range(size):
+            for j in range(size):
+                if board[i][j] != ' ':
+                    new_board[i][j] = board[i][j]
+        for i in range(size):
+            print(new_board[i])
 
     def get_move(self, board, size):
         # Find all available positions on the board
@@ -76,6 +85,11 @@ class TicTacToeAI:
                     best_score = score
                     best_move = move
         return best_move
+    
+    def get_move_input(self):
+        r, c = input('Enter row, col: ').split()
+        return int(r), int(c) 
+
         
     def validate(self, r, c, size):
         return r >= 0 and r < size and c >= 0 and c < size
@@ -169,27 +183,30 @@ class TicTacToeAI:
         r, c = move
         # O
         ally = self.current_player.value
-        print(ally)
+        
         # X
         enemy = self.next_player.value
-        print(enemy)
+        
         
         # Advantage of ally if ally makes the move
         board[r][c] = ally
+        
         statistics_score = self._score_cell(ally, move, board, size)
         win_situation = self._win_situation(statistics_score)
         attack_score = self._synthesize_score(statistics_score)
         adv += (win_situation * win_situation_score + attack_score[-1] + attack_score[1] + 4 * attack_score[2] 
                 + 9 * attack_score[3] + 16 * attack_score[4])
-        print(f"win_situation = {win_situation} ; attack_score = {attack_score} ; adv = {adv} ; statistic_scores = {statistics_score}")
+        
         # Disadvantage of ally if enemy makes the move
         board[r][c] = enemy
+        
         statistics_score = self._score_cell(enemy, move, board, size)
         lose_situation = self._win_situation(statistics_score)
         defend_score = self._synthesize_score(statistics_score)
         dis += (lose_situation * lose_situation_score + defend_score[-1] + defend_score[1] + 4 * defend_score[2]
                 + 9 * defend_score[3] + 16 * defend_score[4])
-        print(f"lose_situation = {lose_situation} ; defend_score = {defend_score}; dis = {dis} ; statistic_scores = {statistics_score}")
+        
+
         res = adv + dis
         board[r][c] = " "
         return res
